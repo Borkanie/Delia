@@ -1,27 +1,39 @@
 <template>
-  <div class="app" :style="{ backgroundImage: 'url(' + backgroundImage + ')' }">
-    <div class="title-section">
-      <h1>Welcome to My Awesome Website</h1>
-      <p>Explore our amazing items below:</p>
+  <div class="app">
+    <div class="title-region">
+      <video class="video" autoplay loop muted>
+        <source :src="videoSrc" type="video/mp4" />
+          <!-- Add additional source elements for different video formats if needed -->
+      </video>  
+      <!-- Your content goes here (e.g., other components, text, etc.) -->
+      <div class="title-section">
+        <h1>EventSpotter</h1>
+        <p>Enhancing Event Discovery since 2023</p>
+        <LocationSearchBar @search="performSearch" class="lcoationBar"/>
+        <!-- Rest of your content -->      
+      </div>
     </div>
-
-    <item-component
+    <div class="component-region">
+      <item-component
       v-for="item in items"
       :key="item.id"
       :background-image="item.image"
       :title="item.title"
       :description="item.description"
-    />
+      />
+    </div>    
   </div>
 </template>
 
 <script>
 import ItemComponent from './components/ItemComponent.vue';
+import LocationSearchBar from './components/LocationSearchBar.vue';
 
 export default {
   name: 'App',
   components: {
     ItemComponent,
+    LocationSearchBar,    
   },
   data() {
     return {
@@ -51,7 +63,14 @@ export default {
           description: 'Description for Item 4',
         },
       ],
+      videoSrc: require('@/assets/bgvid.mp4'),
     };
+  },
+  methods: {
+    performSearch(query) {
+      // Handle the search query (e.g., call an API to fetch results)
+      console.log('Performing search for:', query);
+    },
   },
 };
 </script>
@@ -62,30 +81,67 @@ export default {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  background-size: cover;
-  background-position: center;
-  padding-top: 60px; /* Add some top padding to create space for the title section */
+  padding-top: 100px; /* Add some top padding to create space for the title section */
+}
+.title-region{
+   /* Set the child div to take up full width of its parent */
+   width: 100%;
+  height: 500px; /* Optionally set the height to 100% as well */
+}
+
+.video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1; /* Ensure the video is behind the content */
 }
 
 .title-section {
-  text-align: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;  
   padding: 20px;
-  color: #fff;
-  background-color: rgba(0, 0, 0, 0.7); /* Add a semi-transparent background to the title section */
+  color: #ffffff00;
 }
 
 .title-section h1 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
+  font-size: 8rem;
+  color: rgb(0, 0, 0);
 }
 
 .title-section p {
-  font-size: 1.2rem;
+  font-size: 2rem;
+  color: rgb(0, 0, 0);
 }
 
-.items-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+.lcoationBar {
+  width: 50%;
+  padding-left: 25%;
+  align-items: center;
+  align-items: center;
 }
+
+.component-region{
+  width: 100%;
+  height: 100%; /* Optionally set the height to 100% as well */
+  background-size: cover;
+  background-position: center;
+  background-image: url('@/assets/l7.jpg');
+  background-size: cover; /* Adjust as needed */
+  background-position: center; /* Adjust as needed */
+
+  /* Center the child horizontally using flexbox */
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  justify-content: center;
+  align-items: center;
+}
+
+
 </style>
