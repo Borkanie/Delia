@@ -1,147 +1,17 @@
 <template>
-  <div class="app">
-    <div class="title-region">
-      <video class="video" autoplay loop muted>
-        <source :src="videoSrc" type="video/mp4" />
-          <!-- Add additional source elements for different video formats if needed -->
-      </video>  
-      <!-- Your content goes here (e.g., other components, text, etc.) -->
-      <div class="title-section">
-        <h1>EventSpotter</h1>
-        <p>Enhancing Event Discovery since 2023</p>
-        <LocationSearchBar @search="performSearch" class="lcoationBar"/>
-        <!-- Rest of your content -->      
-      </div>
-    </div>
-    <div class="component-region">
-      <item-component
-      v-for="item in items"
-      :key="item.id"
-      :background-image="item.image"
-      :title="item.title"
-      :description="item.description"
-      />
-    </div>    
+  <div id="app">
+    <h1>Event Search App</h1>
+    <EventSearch />
   </div>
 </template>
 
 <script>
-import ItemComponent from './components/ItemComponent.vue';
-import LocationSearchBar from './components/LocationSearchBar.vue';
+import EventSearch from './components/EventSearch.vue';
 
 export default {
-  name: 'App',
   components: {
-    ItemComponent,
-    LocationSearchBar,    
-  },
-  data() {
-    return {
-      items: [
-        {
-          id: 1,
-          image: require('@/assets/t1.jpg'),
-          title: 'Item 1',
-          description: 'Description for Item 1',
-        },
-        {
-          id: 2,
-          image: require('@/assets/t2.jpg'),
-          title: 'Item 2',
-          description: 'Description for Item 2',
-        },
-        {
-          id: 3,
-          image: require('@/assets/t3.jpg'),
-          title: 'Item 3',
-          description: 'Description for Item 3',
-        },
-        {
-          id: 4,
-          image: require('@/assets/t4.jpg'),
-          title: 'Item 4',
-          description: 'Description for Item 4',
-        },
-      ],
-      videoSrc: require('@/assets/bgvid.mp4'),
-    };
-  },
-  methods: {
-    performSearch(query) {
-      // Handle the search query (e.g., call an API to fetch results)
-      console.log('Performing search for:', query);
-    },
+    EventSearch,
   },
 };
 </script>
 
-<style>
-.app {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  padding-top: 100px; /* Add some top padding to create space for the title section */
-}
-.title-region{
-   /* Set the child div to take up full width of its parent */
-   width: 100%;
-  height: 500px; /* Optionally set the height to 100% as well */
-}
-
-.video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: -1; /* Ensure the video is behind the content */
-}
-
-.title-section {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  text-align: center;  
-  padding: 20px;
-  color: #ffffff00;
-}
-
-.title-section h1 {
-  font-size: 8rem;
-  color: rgb(0, 0, 0);
-}
-
-.title-section p {
-  font-size: 2rem;
-  color: rgb(0, 0, 0);
-}
-
-.lcoationBar {
-  width: 50%;
-  padding-left: 25%;
-  align-items: center;
-  align-items: center;
-}
-
-.component-region{
-  width: 100%;
-  height: 100%; /* Optionally set the height to 100% as well */
-  background-size: cover;
-  background-position: center;
-  background-image: url('@/assets/l7.jpg');
-  background-size: cover; /* Adjust as needed */
-  background-position: center; /* Adjust as needed */
-
-  /* Center the child horizontally using flexbox */
-  display: flex;
-  flex-direction: column; /* Stack items vertically */
-  justify-content: center;
-  align-items: center;
-}
-
-
-</style>
