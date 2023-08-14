@@ -40,6 +40,24 @@
         ],
       };
     },
+    methods: {
+      regenerateElements(result) {
+        id = 0
+        result['elements'].foreach(res=>{
+        this.slides.push({
+          id: id++,
+          image: './../assets/t3.jpg',
+          title: res['name'],
+          description: res['description'],
+        })
+      })
+    },
+    handleResultOK(result) {
+      regenerateElements(result)
+      
+    },
+
+  }
   };
   </script>
   
