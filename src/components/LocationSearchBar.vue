@@ -1,9 +1,12 @@
 <template>
-  <div class="location-search-bar">
-    <input type="text" v-model="searchQuery" placeholder="Enter a location..." @input="handleInput" />
+  <!-- Loading overlay with spinner (adjust the markup as needed) -->
+  <div v-if="loading" class="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+  <div v-else class="event-search-bar">
+    <input type="text" v-model="searchQuery" placeholder="Enter a event..." @input="handleInput" />
     <button @click="search">Search</button>
-    <button class="location-button" @click="getUserLocation">Get My Location</button>
-  </div>
+   </div>
 </template>
   
 <script>
@@ -12,72 +15,72 @@ export default {
   data() {
     return {
       searchQuery: '',
+      loading: false
     };
   },
   methods: {
     handleInput() {
       // Handle input changes if needed
     },
-    GetElementsAtLocation(locationQuery) {
+    async fetchWithTimeout(url, timeout = 60000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-      fetch(`http://localhost:5000/search?query=${locationQuery}`)
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId); // Clear the timeout since the request succeeded
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId); // Clear the timeout on error as well
+      throw error;
+    }
+    },
+    GetPostsAboutEvent(event) {
+      this.loading = true; // Set loading to true before making the request
+      this.fetchWithTimeout(`http://localhost:5000/facebook?query=${event}&posts=10`)
         .then(response => {
+          this.loading = false; // Set loading to false after the request completes
           if (!response.ok) {
             throw new Error('Network response was not ok');
           }
           return response.json();
         })
         .then(data => {
-          this.$emit('resultGood', data);
+          this.$emit('facebook-result-ok', data);
         })
         .catch(error => {
           // Handle errors
-          console.error('Error:', error);
+          console.error('facebook-result-error', error);
         });
+      
     },
     async search() {
-      result = GetElementsAtLocation("events+in+cluj")
+      console.log(this.searchQuery);
+      const result = this.GetPostsAboutEvent(this.searchQuery)
       
       this.$emit('resultOK', result);
       //this.$emit('search', this.searchQuery);
       },
-      getUserLocation() {
-        if ('geolocation' in navigator) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const latitude = position.coords.latitude;
-              const longitude = position.coords.longitude;
-              console.log('User location:', latitude, longitude);
-
-              // Use the user's location for further actions (e.g., search)
-            },
-            (error) => {
-              console.error('Error getting user location:', error.message);
-            }
-          );
-        } else {
-          console.error('Geolocation is not available in this browser.');
-        }
-      },
+     
     },
   };
 </script>
   
 <style>
-.location-search-bar {
+.event-search-bar {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.location-search-bar input {
+.event-search-bar input {
   flex: 1;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
-.location-search-bar button {
+.event-search-bar button {
   padding: 8px 12px;
   margin-left: 10px;
   background-color: #007bff;
@@ -87,22 +90,35 @@ export default {
   cursor: pointer;
 }
 
-.location-search-bar button:hover {
+.event-search-bar button:hover {
   background-color: #0056b3;
 }
 
-.location-search-bar .location-button {
-  padding: 8px 12px;
-  margin-left: 10px;
-  background-color: #28a745;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.location-search-bar .location-button:hover {
-  background-color: #1e7e34;
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #ffffff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
 }
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 </style>
   

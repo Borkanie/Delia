@@ -8,102 +8,45 @@ from Element import Element
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from WebScrapper import WebScrapper
 import time
-
+from flask_cors import CORS
 
 app = Flask(__name__)
 
-# Get the path to the directory where this script is located
-script_dir = os.path.dirname(os.path.abspath(__file__))
-chromedriver_path = os.path.join(script_dir, 'chromedriver.exe')
+scrapper = WebScrapper()
+# Allow CORS for all domains (*), you can adjust this based on your needs
 
-options = webdriver.ChromeOptions()
-#options.add_argument('--headless')
+@app.route('/google', methods=['GET'])
+def google():
+    event = request.args.get('query')
 
-# Set ChromeDriver capabilities
-caps = DesiredCapabilities.CHROME.copy()
-caps['pageLoadStrategy'] = 'normal'
-caps['unhandledPromptBehavior'] = 'accept'
-caps['timeout'] = 30  # Set the timeout here (in seconds)
-
-driver = webdriver.Chrome(executable_path=chromedriver_path, options=options,desired_capabilities=caps)
-accepted = True
-
-def searchQuery(query,first = True):
-    #query = request.args.get('query')
-
-    if not query:
+    if not event:
         return jsonify({'error': 'Query parameter "query" is required'}), 400    
 
-    driver.get(f'https://www.google.com/search?q={query}')
+    return scrapper.getFromGoogle(event)
+
+@app.route('/facebook', methods=['GET'])
+def facebook():
+    event = request.args.get('query')
     
-    
-    if first:
-        time.sleep(2)
-        button_xpath = '/html/body/div[3]/div[3]/span/div/div/div/div[3]/div[1]/button[2]'
-        button_element = driver.find_element_by_xpath(button_xpath)
+    posts = request.args.get('posts')
 
-        # Click on the button
-        button_element.click()
-
-    html_content = driver.page_source    
-
-    # Create a BeautifulSoup object
-    soup = BeautifulSoup(html_content, 'html.parser')
-
-    # Replace 'your-class-name' with the actual class name you want to target
-    carousel = soup.find('g-scrolling-carousel')
-
-    elements = carousel.find_all('a') 
-
-    result = []
-    
-    for elem in elements:
-        children = elem.find_all()
-        date = children[7].string
-        location = children[5].string
-        name = children[3].string
-        result.append(Element(name,date,location))
-        json = Element(name,date,location)
-        json = json.JSON()
-        result.append(json)
-    return result
-
-@app.route('/search', methods=['GET'])
-def search():
-    query = request.args.get('query')
-
-    if not query:
+    if not event:
         return jsonify({'error': 'Query parameter "query" is required'}), 400    
-
-    driver.get(f'https://www.google.com/search?q={query}')
-    html_content = driver.page_source    
-
-    # Create a BeautifulSoup object
-    soup = BeautifulSoup(html_content, 'html.parser')
-
-    # Replace 'your-class-name' with the actual class name you want to target
-    carousel = soup.find('g-scrolling-carousel')
-
-    elements = carousel.find_all('a') 
-
-    result = []
-    
-    for elem in elements:
-        children = elem.find_all()
-        date = children[7].string
-        location = children[5].string
-        name = children[3].string
-        result.append(Element(name,date,location))
-        json = Element(name,date,location)
-        result.append(json)
-        
-    # Convert the list of custom elements to dictionaries
-    elements_json = [element.__dict__ for element in result]
-
-    return jsonify({'elements':elements_json})
+    print(event)
+    if not posts:
+        return jsonify({'error': 'Query parameter "posts" is required'}), 400    
+    print(posts)
+    try:
+        return scrapper.getFromFacebook(event,posts)
+    except Exception as ex:
+        return jsonify({'error': 'Internal error'}), 404    
 
 if __name__ == '__main__':
-    searchQuery("events+in+cluj")
+    #searchQuery("events+in+cluj")
+    cors = CORS(app)
+    app.config['CORS_HEADERS'] = 'Content-Type'
     app.run(debug=True)
-    
+    #scrapper.getFromGoogle("Events+in+cluj")
+    #scrapper.getFromFacebook("Untold")

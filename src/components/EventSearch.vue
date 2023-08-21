@@ -14,8 +14,7 @@
   </template>
   
   <script>
-  import axios from 'axios';
-  
+ 
   export default {
     data() {
       return {
@@ -26,20 +25,7 @@
       };
     },
     methods: {
-      async search() {
-        try {
-          const response = await axios.get('https://www.googleapis.com/customsearch/v1', {
-            params: {
-              key: this.apiKey,
-              cx: this.searchEngineId,
-              q: `party in Cluj today`,
-            },
-          });
-          this.events = response.data.items || [];
-        } catch (error) {
-          console.error('Error fetching events:', error);
-        }
-      },
+
     },
   };
   </script>
