@@ -10,9 +10,11 @@
         <h1>EventSpotter</h1>
         <p>Enhancing Event Discovery since 2023</p>
         <LocationSearchBar @search="performSearch"
-         class="lcoationBar"
+         class="locationBar"
          @facebook-result-ok="handleFacebookResultOK"
-         @facebook-result-error="handleFacebookResultError"/>
+         @facebook-result-error="handleFacebookResultError"
+         @instagram-result-ok="handleInstagramResultOK"
+         @instagram-result-error="handleInstagramResultError"/>
         <!-- Rest of your content -->      
       </div>
     </div>
@@ -82,18 +84,20 @@ export default {
     };
   },
   methods: {
+    performSearch(){
+      this.items = [];
+    },
     handleFacebookResultOK(data) {
       
       const posts = data.posts;
       
-      const newitems = [];
-      var id = 0;
+      var id = this.items.length-1;
       posts.forEach(item => {
         
         // Perform any logic you need here
         if(item.image!="None")
         {
-          newitems.push({
+          this.items.push({
           id: id++,
           image: item.image,
           title: item.title,
@@ -103,7 +107,7 @@ export default {
         });
         }else{
           
-          newitems.push({
+          this.items.push({
           id: id++,
           image: require('@/assets/t3.jpg'),
           title: item['title'],
@@ -113,12 +117,33 @@ export default {
           
         }
        });
+    },
+    handleFacebookResultError() {
+      
+    },
+
+    handleInstagramResultOK(data) {
+      
+      const posts = data.posts;
+
+      var id = this.items.length-1;
+      posts.forEach(item => {
+          this.items.push({
+          id: id++,
+          image: item.image,
+          title: item.title,
+          description: item.text,
+          hasImage: true,
+          backgroundColor: faceBookColor
+        });
+        
+       });
 
       // Update the items array with new data
       this.items = newitems;
     },
-    handleFacebookResultError() {
-      this.items = [];
+    handleInstagramResultError() {
+      
     },
   },
 };
@@ -164,7 +189,7 @@ export default {
   font-size: 2rem;
   color: rgb(0, 0, 0);
 }
-.lcoationBar {
+.locationBar {
   width: 50%;
   padding-left: 25%;
   align-items: center;

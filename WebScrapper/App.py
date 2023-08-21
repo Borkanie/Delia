@@ -11,7 +11,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from WebScrapper import WebScrapper
 import time
 from flask_cors import CORS
+import threading
 
+
+# Create a lock
+lock = threading.Lock()
 app = Flask(__name__)
 
 scrapper = WebScrapper()
@@ -19,29 +23,41 @@ scrapper = WebScrapper()
 
 @app.route('/google', methods=['GET'])
 def google():
-    event = request.args.get('query')
+    with lock:
+        event = request.args.get('query')
 
-    if not event:
-        return jsonify({'error': 'Query parameter "query" is required'}), 400    
+        if not event:
+            return jsonify({'error': 'Query parameter "query" is required'}), 400    
 
-    return scrapper.getFromGoogle(event)
+        return scrapper.getFromGoogle(event)
 
 @app.route('/facebook', methods=['GET'])
 def facebook():
-    event = request.args.get('query')
+    with lock:
+        event = request.args.get('query')
     
-    posts = request.args.get('posts')
+        posts = request.args.get('posts')
 
-    if not event:
-        return jsonify({'error': 'Query parameter "query" is required'}), 400    
-    print(event)
-    if not posts:
-        return jsonify({'error': 'Query parameter "posts" is required'}), 400    
-    print(posts)
-    try:
-        return scrapper.getFromFacebook(event,posts)
-    except Exception as ex:
-        return jsonify({'error': 'Internal error'}), 404    
+        if not event:
+            return jsonify({'error': 'Query parameter "query" is required'}), 400    
+        if not posts:
+            return jsonify({'error': 'Query parameter "posts" is required'}), 400    
+        try:
+            return scrapper.getFromFacebook(event,posts)
+        except Exception as ex:
+            return jsonify({'error': 'Internal error'}), 404    
+
+@app.route('/instagram', methods=['GET'])
+def instagram():
+    with lock:
+        event = request.args.get('query')
+        if not event:
+            return jsonify({'error': 'Query parameter "query" is required'}), 400    
+        try:
+            return scrapper.getFromInstagram(event)
+        except Exception as ex:
+            return jsonify({'error': 'Internal error'}), 404    
+
 
 if __name__ == '__main__':
     #searchQuery("events+in+cluj")
@@ -49,4 +65,4 @@ if __name__ == '__main__':
     app.config['CORS_HEADERS'] = 'Content-Type'
     app.run(debug=True)
     #scrapper.getFromGoogle("Events+in+cluj")
-    #scrapper.getFromFacebook("Untold")
+    #scrapper.getFromInstagram("electriccastle")

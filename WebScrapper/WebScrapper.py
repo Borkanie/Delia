@@ -24,7 +24,10 @@ class WebScrapper:
 
         options = webdriver.ChromeOptions()
         #options.add_argument('--headless')
-
+        # Pass the argument 1 to allow and 2 to block
+        options.add_experimental_option(
+            "prefs", {"profile.default_content_setting_values.notifications": 2}
+        )
         # Set ChromeDriver capabilities
         caps = DesiredCapabilities.CHROME.copy()
         caps['pageLoadStrategy'] = 'normal'
@@ -37,6 +40,7 @@ class WebScrapper:
 
         self.logInOnFacebook()
         time.sleep(1)
+        self.logInOnInstagram()
 
     def getFromGoogle(self,query:str) -> str:
 
@@ -70,6 +74,14 @@ class WebScrapper:
         return ""
         #return jsonify({'elements':elements_json})
 
+    
+    def clickOnFullXPath(self,button_xpath):
+        wait = WebDriverWait(self.driver, 10)
+        button_element = wait.until(EC.element_to_be_clickable((By.XPATH, button_xpath)))
+
+        # Click on the button
+        button_element.click()
+
     def logInOnFacebook(self) -> None:
         
         # Switch to the second tab
@@ -80,12 +92,7 @@ class WebScrapper:
 
         time.sleep(3)
         button_xpath = '/html/body/div[3]/div[2]/div/div/div/div/div[4]/button[1]'
-
-        wait = WebDriverWait(self.driver, 10)
-        button_element = wait.until(EC.element_to_be_clickable((By.XPATH, button_xpath)))
-
-        # Click on the button
-        button_element.click()
+        self.clickOnFullXPath(button_xpath)
         
         # Perform the login on the second tab
         email_input = self.driver.find_element_by_id('email')
@@ -97,13 +104,69 @@ class WebScrapper:
 
         # Do other actions on the second tab if needed
 
+    def logInOnInstagram(self) -> None:
+        
+        # Switch to the second tab
+        self.driver.switch_to.window(self.driver.window_handles[0])
+        
+        # Navigate to the Facebook login page in the second tab
+        self.driver.get('https://www.instagram.com/')
+
+        # allow the page to load
+        time.sleep(3)
+        button_xpath = '/html/body/div[2]/div/div/div[3]/div/div/div[1]/div/div[2]/div/div/div/div/div[2]/div/button[1]'
+        
+        self.clickOnFullXPath(button_xpath)
+
+        time.sleep(5)
+
+    def getFromInstagram(self,query:str,posts=5) -> str:
+
+        # Switch to the second tab
+        self.driver.switch_to.window(self.driver.window_handles[0])
+
+        self.driver.get(f"https://www.instagram.com/explore/tags/{query}/")
+        
+        posts_xpath = "/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/section/main/article/div/div/div"
+
+        try:
+            wait = WebDriverWait(self.driver, 10)
+            posts_element = wait.until(EC.element_to_be_clickable((By.XPATH, posts_xpath)))
+
+            result = []
+
+            posts_rows = posts_element.find_elements(By.XPATH, '*')
+            for row in posts_rows:
+                posts = row.find_elements(By.XPATH, '*')
+                for post in posts:
+                    # Find the first child element of type img
+                    first_img_element = post.find_element_by_css_selector("img:first-of-type")
+
+                    img_src = first_img_element.get_attribute("src")
+                    img_alt = first_img_element.get_attribute("alt")
+
+                    result.append({
+                        "title":"instagram post",
+                        "text":img_alt,
+                        "image":img_src,
+                    })
+            return jsonify({"posts":result})
+
+        except Exception as ex:
+            return jsonify({"posts":"None"})
+
+      
+        result = []
+        
+        return jsonify({"posts":result})
+
+
     def getFromFacebook(self,query:str,posts=5) -> str:
 
         # Switch to the second tab
         self.driver.switch_to.window(self.driver.window_handles[1])
 
         self.driver.get(f"https://www.facebook.com/search/posts/?q={query}")
-
         
         postlist_xpath = '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div/div[1]/div[1]/div[2]/div/div/div/div/div'
 
@@ -121,7 +184,7 @@ class WebScrapper:
             oldIndex = len(descendant_elements)
             descendant_elements = postlist_element.find_elements(By.XPATH, '*')
             for i in range(index,len(descendant_elements)):
-                elem = self.getPost(descendant_elements[i])
+                elem = self.getPostFromFacebook(descendant_elements[i])
                 if elem is not None:
                     result.append(elem)
                     if len(result)==posts:
@@ -130,7 +193,7 @@ class WebScrapper:
 
         return jsonify({"posts":result})
 
-    def getPost(self,httpElement) -> str:
+    def getPostFromFacebook(self,httpElement) -> str:
         try:
             # Scroll to the element using an actions chain
             actions = ActionChains(self.driver)

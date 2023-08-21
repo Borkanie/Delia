@@ -10,6 +10,8 @@
 </template>
   
 <script>
+var lodatingNumber = 0;
+//const lock = new Lock();
 export default {
   name: 'LocationSearchBar',
   data() {
@@ -19,6 +21,23 @@ export default {
     };
   },
   methods: {
+    addLoading(){
+      //lock.acquire();
+      lodatingNumber+=1;
+      if(lodatingNumber > 0){
+        this.loading = true;
+      }      
+      //lock.release();
+    },
+    substractLoading(){
+      //lock.acquire();
+      lodatingNumber-=1;
+      if(lodatingNumber == 0){
+        this.loading = false;
+      }
+      
+      //lock.release();
+    },
     handleInput() {
       // Handle input changes if needed
     },
@@ -35,11 +54,14 @@ export default {
       throw error;
     }
     },
+    StringIntoInstagramFormat(event){
+      return event.replace(/\s+/g, "").toLowerCase();
+    },
     GetPostsAboutEvent(event) {
-      this.loading = true; // Set loading to true before making the request
+      this.addLoading();
       this.fetchWithTimeout(`http://localhost:5000/facebook?query=${event}&posts=10`)
         .then(response => {
-          this.loading = false; // Set loading to false after the request completes
+          this.substractLoading();
           if (!response.ok) {
             throw new Error('Network response was not ok');
           }
@@ -52,7 +74,22 @@ export default {
           // Handle errors
           console.error('facebook-result-error', error);
         });
-      
+      this.addLoading();
+      this.fetchWithTimeout(`http://localhost:5000/instagram?query=${this.StringIntoInstagramFormat(event)}`)
+        .then(response => {
+          this.substractLoading();
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          this.$emit('instagram-result-ok', data);
+        })
+        .catch(error => {
+          // Handle errors
+          console.error('instagram-result-error', error);
+        });
     },
     async search() {
       console.log(this.searchQuery);
