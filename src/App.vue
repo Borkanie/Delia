@@ -197,7 +197,6 @@ export default {
   width: 100%;
   height: 100%;
   text-align: center;  
-  padding: 20px;
   color: #ffffff00;
 }
 .title-section h1 {
@@ -215,8 +214,10 @@ export default {
   align-items: center;
 }
 .component-region{
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevent scrolling beyond viewport */
   width: 100%;
-  height: 100%; /* Optionally set the height to 100% as well */
   background-size: cover;
   background-position: center;
   background-image: url('@/assets/l7.jpg');
