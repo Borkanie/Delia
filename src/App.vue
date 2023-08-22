@@ -11,6 +11,7 @@
         <p>Enhancing Event Discovery since 2023</p>
         <LocationSearchBar @search="performSearch"
          class="locationBar"
+         @search-started="searchStarted"
          @facebook-result-ok="handleFacebookResultOK"
          @facebook-result-error="handleFacebookResultError"
          @instagram-result-ok="handleInstagramResultOK"
@@ -36,8 +37,26 @@
 import ItemComponent from './components/ItemComponent.vue';
 import LocationSearchBar from './components/LocationSearchBar.vue';
 
-const faceBookColor = "linear-gradient(to bottom, rgba(142, 142, 142, 0.8), rgba(231, 231, 231, 0.8))";
-const instagramColor = "linear-gradient(to right, rgba(142, 142, 142, 0.8), rgba(231, 231, 231, 0.8))";
+
+// Define the Facebook logo colors with opacity
+const facebookColorsWithOpacity = [
+  'rgba(59, 89, 152, 0.5)',
+  'rgba(72, 103, 170, 0.5)',
+  'rgba(85, 116, 187, 0.5)',
+  'rgba(107, 127, 191, 0.5)',
+  'rgba(131, 138, 194, 0.5)',
+];
+
+const faceBookColor  = `linear-gradient(45deg, ${facebookColorsWithOpacity.join(', ')})`;
+
+const instagramColors = [
+  'rgba(225, 48, 108, 0.5)',
+  'rgba(214, 36, 159, 0.5)',
+  'rgba(193, 53, 132, 0.5)',
+  'rgba(88, 81, 219, 0.5)',
+  'rgba(64, 93, 230, 0.5)',
+];
+const instagramColor = `linear-gradient(45deg, ${instagramColors.join(', ')})`;
 export default {
   name: 'App',
   components: {
@@ -84,7 +103,7 @@ export default {
     };
   },
   methods: {
-    performSearch(){
+    searchStarted(){
       this.items = [];
     },
     handleFacebookResultOK(data) {

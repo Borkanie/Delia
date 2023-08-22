@@ -1,10 +1,12 @@
 <template>
   <!-- Loading overlay with spinner (adjust the markup as needed) -->
   <div v-if="loading" class="loading-overlay">
+    <div class="spinner-container">
       <div class="spinner"></div>
     </div>
+    </div>
   <div v-else class="event-search-bar">
-    <input type="text" v-model="searchQuery" placeholder="Enter a event..." @input="handleInput" />
+    <input type="text" v-model="searchQuery" placeholder="Search for an event..." @input="handleInput" />
     <button @click="search">Search</button>
    </div>
 </template>
@@ -41,7 +43,7 @@ export default {
     handleInput() {
       // Handle input changes if needed
     },
-    async fetchWithTimeout(url, timeout = 60000) {
+    async fetchWithTimeout(url, timeout = 120000) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -59,7 +61,7 @@ export default {
     },
     GetPostsAboutEvent(event) {
       this.addLoading();
-      this.fetchWithTimeout(`http://localhost:5000/facebook?query=${event}&posts=10`)
+      this.fetchWithTimeout(`http://localhost:5000/facebook?query=${event}&posts=5`)
         .then(response => {
           this.substractLoading();
           if (!response.ok) {
@@ -93,6 +95,7 @@ export default {
     },
     async search() {
       console.log(this.searchQuery);
+      this.$emit("search-started");
       const result = this.GetPostsAboutEvent(this.searchQuery)
       
       this.$emit('resultOK', result);
@@ -135,14 +138,22 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 100vw !important;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
 }
-
+.spinner-container {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 50%;
+  left: 40%;
+  transform: translate(-50%, -50%);
+}
 .spinner {
   border: 4px solid rgba(255, 255, 255, 0.3);
   border-top: 4px solid #ffffff;
@@ -150,6 +161,7 @@ export default {
   width: 20px;
   height: 20px;
   animation: spin 1s linear infinite;
+  align-self: center;
 }
 
 @keyframes spin {

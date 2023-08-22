@@ -12,6 +12,7 @@ from WebScrapper import WebScrapper
 import time
 from flask_cors import CORS
 import threading
+from timeout_decorator import timeout
 
 
 # Create a lock
@@ -44,6 +45,8 @@ def facebook():
             return jsonify({'error': 'Query parameter "posts" is required'}), 400    
         try:
             return scrapper.getFromFacebook(event,posts)
+        except TimeoutError:
+            return jsonify({'error': 'Request timed out'}), 500
         except Exception as ex:
             return jsonify({'error': 'Internal error'}), 404    
 
@@ -55,6 +58,9 @@ def instagram():
             return jsonify({'error': 'Query parameter "query" is required'}), 400    
         try:
             return scrapper.getFromInstagram(event)
+        except TimeoutError:
+            return jsonify({'error': 'Request timed out'}), 500
+
         except Exception as ex:
             return jsonify({'error': 'Internal error'}), 404    
 

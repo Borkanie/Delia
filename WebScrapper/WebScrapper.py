@@ -187,7 +187,7 @@ class WebScrapper:
                 elem = self.getPostFromFacebook(descendant_elements[i])
                 if elem is not None:
                     result.append(elem)
-                    if len(result)==posts:
+                    if len(result)>=int(posts):
                         return jsonify({"posts":result})
             index = oldIndex
 
