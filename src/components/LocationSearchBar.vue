@@ -43,7 +43,7 @@ export default {
     handleInput() {
       // Handle input changes if needed
     },
-    async fetchWithTimeout(url, timeout = 120000) {
+    async fetchWithTimeout(url, timeout = 60000) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -53,6 +53,7 @@ export default {
       return response;
     } catch (error) {
       clearTimeout(timeoutId); // Clear the timeout on error as well
+      this.substractLoading();
       throw error;
     }
     },

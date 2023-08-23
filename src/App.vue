@@ -28,6 +28,7 @@
       :description="item.description"
       :hasImage="item.hasImage"
       :background-color="item.backgroundColor"
+      :link = "item.link"
       />
     </div>    
   </div>
@@ -40,21 +41,21 @@ import LocationSearchBar from './components/LocationSearchBar.vue';
 
 // Define the Facebook logo colors with opacity
 const facebookColorsWithOpacity = [
-  'rgba(59, 89, 152, 0.5)',
-  'rgba(72, 103, 170, 0.5)',
-  'rgba(85, 116, 187, 0.5)',
-  'rgba(107, 127, 191, 0.5)',
-  'rgba(131, 138, 194, 0.5)',
+  'rgba(59, 89, 152, 0.8)',
+  'rgba(72, 103, 170, 0.8)',
+  'rgba(85, 116, 187, 0.8)',
+  'rgba(107, 127, 191, 0.8)',
+  'rgba(131, 138, 194, 0.8)',
 ];
 
 const faceBookColor  = `linear-gradient(45deg, ${facebookColorsWithOpacity.join(', ')})`;
 
 const instagramColors = [
-  'rgba(225, 48, 108, 0.5)',
-  'rgba(214, 36, 159, 0.5)',
-  'rgba(193, 53, 132, 0.5)',
-  'rgba(88, 81, 219, 0.5)',
-  'rgba(64, 93, 230, 0.5)',
+  'rgba(225, 48, 108, 0.8)',
+  'rgba(214, 36, 159, 0.8)',
+  'rgba(193, 53, 132, 0.8)',
+  'rgba(88, 81, 219, 0.8)',
+  'rgba(64, 93, 230, 0.8)',
 ];
 const instagramColor = `linear-gradient(45deg, ${instagramColors.join(', ')})`;
 export default {
@@ -65,39 +66,7 @@ export default {
   },
   data() {
     return {
-      items: [
-        {
-          id: 1,
-          backgroundImage: require('@/assets/t1.jpg'),
-          title: 'Item 1',
-          description: 'Description for Item 1',
-          hasImage: true,
-          backgroundColor: faceBookColor
-        },
-        {
-          id: 2,
-          backgroundImage: require('@/assets/t2.jpg'),
-          title: 'Item 2',
-          description: 'Description for Item 2',
-          hasImage: false,
-          backgroundColor: faceBookColor
-        },
-        {
-          id: 3,
-          backgroundImage: require('@/assets/t3.jpg'),
-          title: 'Item 3',
-          description: 'Description for Item 3',
-          hasImage: true,
-          backgroundColor: instagramColor
-        },
-        {
-          id: 4,
-          backgroundImage: require('@/assets/t4.jpg'),
-          title: 'Item 4',
-          description: 'Description for Item 4',
-          hasImage: false,
-          backgroundColor: instagramColor
-        },
+      items: [     
       ],
       videoSrc: require('@/assets/bgvid.mp4'),
     };
@@ -122,7 +91,8 @@ export default {
           title: item.title,
           description: item.text,
           hasImage: true,
-          backgroundColor: faceBookColor
+          backgroundColor: faceBookColor,
+          link: item.link
         });
         }else{
           
@@ -132,7 +102,8 @@ export default {
           title: item['title'],
           description: item['text'],
           hasImage: false,
-          backgroundColor: faceBookColor});
+          backgroundColor: faceBookColor,
+          link: item.link});
           
         }
        });
@@ -153,13 +124,12 @@ export default {
           title: item.title,
           description: item.text,
           hasImage: true,
-          backgroundColor: faceBookColor
+          backgroundColor: instagramColor
         });
         
        });
 
-      // Update the items array with new data
-      this.items = newitems;
+
     },
     handleInstagramResultError() {
       

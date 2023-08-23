@@ -4,7 +4,7 @@
         <div class="item-content">
             <div class="title-container" ref="titleContainer">
                 <div class="rectangleTitle" :style="{ width: rectangleTitleWidth + 'px' }"></div>
-                <h3 class="item-title" ref="itemTitle">{{ title }}</h3>               
+                <a class="item-title" :href="{link}" ref="itemTitle">{{ title }}</a>               
             </div>
             <div class="description-container" ref="descriptionContainer">
                 <div class="rectangleDescription" :style="{ width: rectangleDescriptionWidth + 'px' }"></div>
@@ -40,6 +40,10 @@
         required: true,
       },
       backgroundColor:{
+        type: String,
+        required: true
+      },
+      link:{
         type: String,
         required: true
       }

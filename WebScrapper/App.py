@@ -12,7 +12,6 @@ from WebScrapper import WebScrapper
 import time
 from flask_cors import CORS
 import threading
-from timeout_decorator import timeout
 
 
 # Create a lock

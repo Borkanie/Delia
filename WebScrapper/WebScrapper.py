@@ -141,7 +141,12 @@ class WebScrapper:
                 for post in posts:
                     # Find the first child element of type img
                     first_img_element = post.find_element_by_css_selector("img:first-of-type")
-
+                    
+                    # Navigate up to the parent three levels
+                    parent_level_1 = first_img_element.find_element_by_xpath("..")  # First level up
+                    parent_level_2 = parent_level_1.find_element_by_xpath("..")    # Second level up
+                    parent_level_3 = parent_level_2.find_element_by_xpath("..")    # Third level up
+                    img_url = parent_level_3.get_attribute("href")
                     img_src = first_img_element.get_attribute("src")
                     img_alt = first_img_element.get_attribute("alt")
 
@@ -149,16 +154,12 @@ class WebScrapper:
                         "title":"instagram post",
                         "text":img_alt,
                         "image":img_src,
+                        "link":img_url
                     })
             return jsonify({"posts":result})
 
         except Exception as ex:
             return jsonify({"posts":"None"})
-
-      
-        result = []
-        
-        return jsonify({"posts":result})
 
 
     def getFromFacebook(self,query:str,posts=5) -> str:
@@ -180,11 +181,13 @@ class WebScrapper:
 
         # Process each descendant element
         index = 0
-        while(len(result)<int(posts)):
+        tries = 0
+        while(len(result)<int(posts) and tries<2*int(posts)):
             oldIndex = len(descendant_elements)
             descendant_elements = postlist_element.find_elements(By.XPATH, '*')
             for i in range(index,len(descendant_elements)):
                 elem = self.getPostFromFacebook(descendant_elements[i])
+                tries = tries+1
                 if elem is not None:
                     result.append(elem)
                     if len(result)>=int(posts):
@@ -203,6 +206,10 @@ class WebScrapper:
             title_xpath="div/div/div/div/div/div/div/div/div/div/div[8]/div/div/div[2]/div/div[2]/div/div[1]/span/h3/div/span/a/span"
         
             title = httpElement.find_element(By.XPATH,title_xpath)
+            
+            link_xpath="div/div/div/div/div/div/div/div/div/div/div[8]/div/div/div[2]/div/div[2]/div/div[1]/span/h3/div/span/a"
+            link = httpElement.find_element(By.XPATH,link_xpath)
+            
             text_xpath = "div/div/div/div/div/div/div/div/div/div/div[8]/div/div/div[3]/div[1]/div/div/div/span"
 
             text = httpElement.find_element(By.XPATH,text_xpath)
@@ -227,6 +234,7 @@ class WebScrapper:
             "title" : title.text,
             "text" : text.text,
             "image" : "None",
+            "link": link.get_attribute('href')
             }
             return result
 
@@ -237,6 +245,7 @@ class WebScrapper:
         result = {
             "title" : title.text,
             "text" : text.text,
-            "image" : image_source
+            "image" : image_source,
+            "link": link
         }
         return result
